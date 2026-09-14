@@ -27,14 +27,9 @@ _CHARS_PER_TOKEN = 3.8
 
 
 def methodology() -> str:
-    # TODO (Exercise 3): Return the string naming the currently active path.
-    # When ANTHROPIC_API_KEY is set, return:
-    #     "Anthropic messages.count_tokens endpoint (model-authoritative)"
-    # otherwise return:
-    #     f"len(text) / {_CHARS_PER_TOKEN} heuristic (no API key available)"
-    # The returned string is written verbatim into budget.json so reviewers can
-    # interpret the per-section numbers without re-deriving the algorithm.
-    return f"len(text) / {_CHARS_PER_TOKEN} heuristic (stub — Exercise 3 adds the SDK dispatch)"
+    if os.environ.get("ANTHROPIC_API_KEY"):
+        return "Anthropic messages.count_tokens endpoint (model-authoritative)"
+    return f"len(text) / {_CHARS_PER_TOKEN} heuristic (no API key available)"
 
 
 @lru_cache(maxsize=4096)
