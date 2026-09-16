@@ -4,34 +4,24 @@ This file is the **project-level** entry point for the e-commerce monorepo. Ever
 
 ## Scope: what belongs here vs. elsewhere
 
-<!--
-TODO: Add a side-by-side table distinguishing project-level (`./CLAUDE.md`, `.claude/`),
-      user-level (`~/.claude/`), and directory-level (subdir `CLAUDE.md`) scopes. The table
-      MUST explicitly state that user-level settings are NOT shared with teammates via
-      version control, and MUST include one concrete example of content that belongs at
-      user-level (e.g. preferred commit message style).
--->
+Claude Code resolves configuration in a hierarchy:
 
-<!-- TODO: Add a short paragraph tying the table back to the team's intent. -->
+| Scope | Path | Purpose |
+|-------|------|---------|
+| **Project-level** | `./CLAUDE.md`, `.claude/standards/`, `.claude/rules/` | Conventions for *this* repo. Lives in git. Shared with the whole team. |
+| **User-level** | `~/.claude/CLAUDE.md`, `~/.claude/commands/`, `~/.claude/skills/` | Personal preferences. **Not shared via version control** — they stay on your laptop and never reach teammates. |
+| **Directory-level** | `path/CLAUDE.md` inside a subdir | Conventions narrower than the whole repo. We prefer `.claude/rules/` with glob `paths:` instead, so cross-cutting conventions (e.g. test files everywhere) work cleanly. |
+
+If something would only matter to you — your preferred commit-message style, your editor-specific snippets, a personal `/morning` summary command — put it under `~/.claude/`. Anything the whole team should agree on goes here in `./CLAUDE.md` or under `.claude/standards/`.
 
 ## Shared standards (modular via @-imports)
 
 The actual conventions live in focused files so this entry point stays scannable:
 
-<!--
-TODO: Use an `@`-import (a bare `@` followed immediately by the path) to pull in each standards file from .claude/standards/.
-
-The `@`-import directive is a BARE LINE on its own — an `@` immediately followed by the path, with no `import` keyword — e.g.
-
-    @.claude/standards/frontend.md
-
-It is NOT Markdown link syntax like `[name](path)`. That is a common first-attempt
-mistake — Markdown links render but they do not actually import the file's contents
-into the session.
-
-Four standards files already exist for you under `.claude/standards/`:
-frontend.md, api.md, database.md, testing.md. Add one `@`-import line for each.
--->
+- @.claude/standards/frontend.md
+- @.claude/standards/api.md
+- @.claude/standards/database.md
+- @.claude/standards/testing.md
 
 Path-scoped rules in [.claude/rules/](.claude/rules/) layer on top of these standards and activate only when Claude is editing matching files (React components, API handlers, test files).
 
@@ -48,17 +38,11 @@ Tests are co-located: `Foo.tsx` lives next to `Foo.test.tsx`.
 
 ## Troubleshooting
 
-<!--
-TODO: Add a one-liner telling teammates that if a CLAUDE.md instruction isn't being
-      followed, they should run the Claude Code command that lists exactly which
-      configuration files actually loaded for the current session.
-
-      (Hint: the command starts with `/m` and is named after Claude's memory.)
--->
+**Convention isn't being followed?** Run `/memory` in your Claude Code session to see exactly which configuration files actually loaded. The most common cause is an instruction that lives in `~/.claude/CLAUDE.md` (user-level, never shared) when it should be in this file or under `.claude/standards/`.
 
 ## Team workflows
 
-- `/review <pr-ref>` — codified PR review checklist. (You will author this in Exercise 2.)
-- `/deploy-check` — read-only pre-deployment validation. (You will author this in Exercise 3.)
+- `/review <pr-ref>` — codified PR review checklist. See [.claude/commands/review.md](.claude/commands/review.md).
+- `/deploy-check` — read-only pre-deployment validation, runs in a forked sub-agent to keep its output out of your main session. See [.claude/skills/deploy-check/SKILL.md](.claude/skills/deploy-check/SKILL.md).
 
-For decisions about when to use plan mode vs. direct execution on this codebase, you will produce a team decision doc in Exercise 4.
+For decisions about when to use plan mode vs. direct execution on this codebase, see [docs/plan-mode-vs-direct-execution.md](docs/plan-mode-vs-direct-execution.md).
