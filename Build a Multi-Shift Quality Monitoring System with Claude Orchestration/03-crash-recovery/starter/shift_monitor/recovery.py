@@ -23,15 +23,11 @@ Decision = Literal["resume", "fresh"]
 
 
 def decide(state: ManifestState, now: datetime) -> Decision:
-    # TODO: Return "resume" or "fresh" based on three cases.
-    #
-    #   1. If the manifest has no steps at all, return "fresh".
-    #      (An empty manifest is a special case that is easy to forget alongside
-    #       the complete-vs-incomplete path.)
-    #   2. If the manifest is complete (last step name == "complete"), return "fresh".
-    #   3. Otherwise the manifest is incomplete. Compare `now` to the last step's
-    #      `ts`: if the gap is <= STALE_RESUME_THRESHOLD_MINUTES, return "resume";
-    #      otherwise return "fresh".
-    #
-    # Boundary note: at exactly 30 minutes, "resume" wins. Use `<=`, not `<`.
-    raise NotImplementedError
+    if not state.steps:
+        return "fresh"
+    if state.complete:
+        return "fresh"
+    last_step = state.steps[-1]
+    if now - last_step.ts <= timedelta(minutes=STALE_RESUME_THRESHOLD_MINUTES):
+        return "resume"
+    return "fresh"
