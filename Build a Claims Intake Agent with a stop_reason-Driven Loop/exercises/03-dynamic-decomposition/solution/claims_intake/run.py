@@ -67,18 +67,35 @@ def _run_one(
     t0 = time.monotonic()
     state: FinalState | None = None
     error: str | None = None
+    messages = [{"role": "user", "content": fixture["initial_message"]}]
+
     with Tracer(trace_path) as tracer:
         try:
-            state = run_loop(
-                client=client,
-                model=model,
-                system=SYSTEM_PROMPT,
-                tools=TOOL_SCHEMAS,
-                messages=[{"role": "user", "content": fixture["initial_message"]}],
-                tool_executor=executor,
-                budget=budget,
-                tracer=tracer,
-            )
+            while True:
+                state = run_loop(
+                    client=client,
+                    model=model,
+                    system=SYSTEM_PROMPT,
+                    tools=TOOL_SCHEMAS,
+                    messages=messages,
+                    tool_executor=executor,
+                    budget=budget,
+                    tracer=tracer,
+                )
+
+                if session.terminal_called:
+                    break
+
+                messages = state.messages + [
+                    {
+                        "role": "user",
+                        "content": (
+                            "The claim is not complete yet. "
+                            "Continue processing and call the appropriate terminal tool "
+                            "before ending the turn."
+                        ),
+                    }
+                ]
         except (BudgetExceeded, UnexpectedStopReason) as exc:
             error = f"{type(exc).__name__}: {exc}"
     return FixtureResult(
